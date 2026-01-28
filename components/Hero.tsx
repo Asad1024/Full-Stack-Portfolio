@@ -32,12 +32,12 @@ const Hero = () => {
   return (
     <section id="home" className="relative py-8 lg:py-10 bg-white overflow-hidden">
 
-      <div className="container mx-auto px-8 md:px-12 lg:px-16 xl:px-20 w-full relative z-10">
+      <div className="container mx-auto px-10 md:px-14 lg:px-20 xl:px-24 w-full relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8 }}
-          className="max-w-2xl mx-auto px-4 space-y-2 lg:space-y-3 pt-12 lg:pt-16"
+          className="max-w-2xl mx-auto px-4 space-y-2 lg:space-y-3 pt-14 lg:pt-20"
         >
           {/* Greeting - left-aligned to match paragraph start */}
           <motion.div

@@ -1,7 +1,9 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
 
 const About = () => {
   const [aboutData, setAboutData] = useState({
@@ -46,7 +48,7 @@ const About = () => {
   return (
     <section id="about" className="relative py-8 lg:py-10 bg-white dark:bg-zinc-950 overflow-hidden">
 
-      <div className="container mx-auto px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
+      <div className="container mx-auto px-10 md:px-14 lg:px-20 xl:px-24 relative z-10">
         <div className="grid grid-cols-1 lg:grid-cols-[1fr_2fr] gap-12 lg:gap-16 items-start">
           {/* Left Side - Image */}
           {profileImage && (
@@ -120,11 +122,19 @@ const About = () => {
                   </motion.p>
                 ))
               ) : (
-                <p className="text-base md:text-lg text-gray-700 leading-relaxed">
+                <p className="text-base md:text-lg text-gray-700 dark:text-zinc-300 leading-relaxed">
                   {aboutData.content}
                 </p>
               )}
             </div>
+
+            <Link
+              href="/journey"
+              className="inline-flex items-center gap-2 text-sm font-semibold text-black dark:text-white hover:text-gray-600 dark:hover:text-zinc-300 transition-colors mt-6"
+            >
+              Read my full journey
+              <ArrowRight size={18} />
+            </Link>
           </motion.div>
         </div>
       </div>

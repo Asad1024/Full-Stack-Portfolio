@@ -26,7 +26,7 @@ const Footer = () => {
 
   return (
     <footer className="bg-black dark:bg-zinc-950 text-white py-12 border-t border-zinc-800">
-      <div className="container mx-auto px-8 md:px-12 lg:px-16 xl:px-20">
+      <div className="container mx-auto px-10 md:px-14 lg:px-20 xl:px-24">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <p className="text-gray-400 mb-0">
             © {currentYear} <span className="text-white font-semibold">Asad</span>. All rights reserved.

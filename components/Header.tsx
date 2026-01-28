@@ -18,11 +18,12 @@ const Header = () => {
   }, [])
 
   const navItems = [
-    { name: 'Home', href: '#home' },
-    { name: 'About', href: '#about' },
-    { name: 'Skills', href: '#skills' },
-    { name: 'Projects', href: '#projects' },
-    { name: 'Contact', href: '#contact' },
+    { name: 'Home', href: '/#home' },
+    { name: 'About', href: '/#about' },
+    { name: 'Skills', href: '/#skills' },
+    { name: 'Projects', href: '/#projects' },
+    { name: 'Contact', href: '/#contact' },
+    { name: 'Journey', href: '/journey' },
   ]
 
   return (
@@ -31,7 +32,7 @@ const Header = () => {
         isScrolled ? 'bg-white/95 backdrop-blur-sm shadow-sm' : 'bg-transparent'
       }`}
     >
-      <nav className="container mx-auto px-8 md:px-12 lg:px-16 xl:px-20 py-4">
+      <nav className="container mx-auto px-10 md:px-14 lg:px-20 xl:px-24 py-4">
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center gap-1.5 text-black dark:text-white hover:opacity-80 transition-opacity">
             <span className="text-sm md:text-base font-semibold">Asad</span>

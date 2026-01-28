@@ -3,9 +3,10 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase/client'
-import { LogOut, User, Briefcase, Code, Mail, Settings, Filter, Phone } from 'lucide-react'
+import { LogOut, User, Briefcase, Code, Mail, Settings, Filter, Phone, BookOpen } from 'lucide-react'
 import ProfileManager from './ProfileManager'
 import AboutManager from './AboutManager'
+import JourneyManager from './JourneyManager'
 import SkillsManager from './SkillsManager'
 import ProjectsManager from './ProjectsManager'
 import ContactsManager from './ContactsManager'
@@ -13,7 +14,7 @@ import ProjectFiltersManager from './ProjectFiltersManager'
 import ContactInfoManager from './ContactInfoManager'
 import AuthDebug from './AuthDebug'
 
-type Tab = 'profile' | 'about' | 'skills' | 'projects' | 'project-filters' | 'contact-info' | 'contacts' | 'debug'
+type Tab = 'profile' | 'about' | 'journey' | 'skills' | 'projects' | 'project-filters' | 'contact-info' | 'contacts' | 'debug'
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>('profile')
@@ -28,6 +29,7 @@ const AdminDashboard = () => {
   const tabs = [
     { id: 'profile' as Tab, label: 'Profile', icon: User },
     { id: 'about' as Tab, label: 'About', icon: Settings },
+    { id: 'journey' as Tab, label: 'Journey', icon: BookOpen },
     { id: 'skills' as Tab, label: 'Skills', icon: Code },
     { id: 'projects' as Tab, label: 'Projects', icon: Briefcase },
     { id: 'project-filters' as Tab, label: 'Project Filters', icon: Filter },
@@ -52,7 +54,7 @@ const AdminDashboard = () => {
         </div>
       </header>
 
-      <div className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-10 md:px-14 lg:px-20 xl:px-24 py-8">
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <aside className="md:w-64 flex-shrink-0">
@@ -81,6 +83,7 @@ const AdminDashboard = () => {
           <main className="flex-1">
             {activeTab === 'profile' && <ProfileManager />}
             {activeTab === 'about' && <AboutManager />}
+            {activeTab === 'journey' && <JourneyManager />}
             {activeTab === 'skills' && <SkillsManager />}
             {activeTab === 'projects' && <ProjectsManager />}
             {activeTab === 'project-filters' && <ProjectFiltersManager />}

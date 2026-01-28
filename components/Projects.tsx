@@ -63,7 +63,7 @@ const Projects = () => {
   return (
     <section id="projects" className="relative py-8 lg:py-10 bg-white dark:bg-zinc-950 overflow-hidden">
 
-      <div className="container mx-auto px-8 md:px-12 lg:px-16 xl:px-20 relative z-10">
+      <div className="container mx-auto px-10 md:px-14 lg:px-20 xl:px-24 relative z-10">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
