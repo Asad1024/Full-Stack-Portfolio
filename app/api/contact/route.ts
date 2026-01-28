@@ -2,7 +2,10 @@ import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 import { Resend } from 'resend'
 
-const resend = new Resend(process.env.RESEND_API_KEY)
+function getResend() {
+  const key = process.env.RESEND_API_KEY
+  return key ? new Resend(key) : null
+}
 
 export async function POST(request: Request) {
   try {
@@ -53,7 +56,8 @@ export async function POST(request: Request) {
     }
 
     // Send email using Resend
-    if (process.env.RESEND_API_KEY) {
+    const resend = getResend()
+    if (resend) {
       try {
         const { data, error: emailError } = await resend.emails.send({
           from: 'Portfolio Contact <onboarding@resend.dev>', // Update this with your verified domain

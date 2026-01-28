@@ -18,7 +18,7 @@ export const createSupabaseClient = () => {
           return { name, value: decodeURIComponent(rest.join('=')) }
         })
       },
-      setAll(cookiesToSet) {
+      setAll(cookiesToSet: { name: string; value: string; options?: { path?: string; maxAge?: number; domain?: string; sameSite?: string; secure?: boolean } }[]) {
         cookiesToSet.forEach(({ name, value, options }) => {
           const cookieString = [
             `${name}=${encodeURIComponent(value)}`,
