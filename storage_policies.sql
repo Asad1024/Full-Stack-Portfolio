@@ -1,0 +1,61 @@
+-- ============================================
+-- SUPABASE STORAGE POLICIES SETUP
+-- ============================================
+-- 
+-- ⚠️ IMPORTANT: Storage policies CANNOT be set via SQL directly!
+-- You MUST use the Supabase Dashboard UI instead.
+--
+-- Follow these steps:
+-- ============================================
+-- STEP 1: Create the Storage Bucket
+-- ============================================
+-- 1. Go to: Dashboard > Storage
+-- 2. Click "New bucket"
+-- 3. Name: portfolio-assets
+-- 4. ✅ Enable "Public bucket"
+-- 5. Click "Create bucket"
+--
+-- ============================================
+-- STEP 2: Set Up Policies via Dashboard UI
+-- ============================================
+-- 1. Click on the "portfolio-assets" bucket
+-- 2. Go to "Policies" tab
+-- 3. Click "New Policy"
+-- 4. For each policy, use these settings:
+--
+-- POLICY 1: Upload (INSERT)
+-- - Policy name: "Authenticated users can upload"
+-- - Allowed operation: INSERT
+-- - Target roles: authenticated
+-- - USING expression: (leave empty)
+-- - WITH CHECK expression: bucket_id = 'portfolio-assets'
+--
+-- POLICY 2: Read (SELECT)  
+-- - Policy name: "Public can read"
+-- - Allowed operation: SELECT
+-- - Target roles: public
+-- - USING expression: bucket_id = 'portfolio-assets'
+-- - WITH CHECK expression: (leave empty)
+--
+-- POLICY 3: Delete (DELETE)
+-- - Policy name: "Authenticated users can delete"
+-- - Allowed operation: DELETE
+-- - Target roles: authenticated
+-- - USING expression: bucket_id = 'portfolio-assets'
+-- - WITH CHECK expression: (leave empty)
+--
+-- ============================================
+-- ALTERNATIVE: Use Storage API (if you prefer code)
+-- ============================================
+-- You can also set policies programmatically, but the
+-- Dashboard UI is the recommended and easiest method.
+--
+-- ============================================
+-- VERIFICATION
+-- ============================================
+-- After setting up policies:
+-- 1. Go to your admin panel: http://localhost:3000/admin
+-- 2. Try uploading an image
+-- 3. Check that it appears in the Storage bucket
+-- ============================================
+
