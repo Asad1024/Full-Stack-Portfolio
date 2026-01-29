@@ -49,12 +49,12 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
+          <div className="hidden md:flex items-center gap-8">
             {navItems.map((item) => (
               <Link
                 key={item.name}
                 href={item.href}
-                className="text-sm font-medium text-black hover:text-gray-600 transition-colors"
+                className="text-sm font-medium text-black hover:text-gray-600 transition-colors relative after:content-[''] after:absolute after:left-0 after:bottom-[-4px] after:h-0.5 after:w-0 after:bg-black after:transition-all after:duration-300 hover:after:w-full"
               >
                 {item.name}
               </Link>
@@ -84,7 +84,7 @@ const Header = () => {
                 <Link
                   key={item.name}
                   href={item.href}
-                  className="block text-sm font-medium text-black hover:text-gray-600 transition-colors"
+                  className="block py-2 text-sm font-medium text-black hover:text-gray-600 transition-colors border-b border-gray-100 last:border-0"
                   onClick={() => setIsMobileMenuOpen(false)}
                 >
                   {item.name}
