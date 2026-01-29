@@ -114,3 +114,7 @@ This Next.js app can be deployed to:
 ## License
 
 MIT License - feel free to use this for your portfolio!
+
+---
+
+*Last updated: January 2025*
