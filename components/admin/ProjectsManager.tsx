@@ -13,7 +13,7 @@ interface Project {
   githubUrl?: string
   liveUrl?: string
   imageUrl?: string
-  demoVideoUrl?: string
+  otherImages?: string[]
   role?: string
   featured: boolean
 }
@@ -30,7 +30,7 @@ const ProjectsManager = () => {
     githubUrl: '',
     liveUrl: '',
     imageUrl: '',
-    demoVideoUrl: '',
+    otherImages: [] as string[],
     role: '',
     featured: false,
   })
@@ -53,7 +53,7 @@ const ProjectsManager = () => {
             githubUrl: p.github_url || p.githubUrl,
             liveUrl: p.live_url || p.liveUrl,
             imageUrl: p.image_url || p.imageUrl,
-            demoVideoUrl: p.demo_video_url || p.demoVideoUrl,
+            otherImages: p.otherImages || [],
           })))
         } else if (data?.error) {
           console.error('API Error:', data.error, data.details)
@@ -77,9 +77,13 @@ const ProjectsManager = () => {
     
     try {
       const technologies = formData.technologies.split(',').map((t) => t.trim()).filter(Boolean)
+      const otherImages = Array.isArray(formData.otherImages)
+        ? formData.otherImages.filter(Boolean)
+        : []
       const projectData = {
         ...formData,
         technologies,
+        otherImages,
       }
 
       const url = '/api/admin/projects'
@@ -104,7 +108,7 @@ const ProjectsManager = () => {
           githubUrl: '',
           liveUrl: '',
           imageUrl: '',
-          demoVideoUrl: '',
+          otherImages: [],
           role: '',
           featured: false,
         })
@@ -136,6 +140,7 @@ const ProjectsManager = () => {
 
   const handleEdit = (project: Project) => {
     setEditingProject(project)
+    const other = project.otherImages && Array.isArray(project.otherImages) ? project.otherImages : []
     setFormData({
       title: project.title,
       description: project.description,
@@ -143,7 +148,7 @@ const ProjectsManager = () => {
       githubUrl: project.githubUrl || '',
       liveUrl: project.liveUrl || '',
       imageUrl: project.imageUrl || '',
-      demoVideoUrl: project.demoVideoUrl || '',
+      otherImages: other,
       role: project.role || '',
       featured: project.featured,
     })
@@ -168,7 +173,7 @@ const ProjectsManager = () => {
           githubUrl: '',
           liveUrl: '',
           imageUrl: '',
-          demoVideoUrl: '',
+          otherImages: [],
           role: '',
           featured: false,
         })
@@ -303,20 +308,53 @@ const ProjectsManager = () => {
                 value={formData.imageUrl}
                 onChange={(url) => setFormData({ ...formData, imageUrl: url })}
                 folder="projects"
-                label="Project Image"
+                label="Thumbnail image"
                 placeholder="Enter image URL or upload a file"
               />
 
               <div>
-                <label className="block text-sm font-medium text-black mb-2">Demo Video URL</label>
-                <input
-                  type="url"
-                  value={formData.demoVideoUrl}
-                  onChange={(e) => setFormData({ ...formData, demoVideoUrl: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none bg-white text-black"
-                  placeholder="https://youtube.com/watch?v=... or https://vimeo.com/..."
-                />
-                <p className="text-xs text-gray-500 mt-1">YouTube, Vimeo, or direct video URL</p>
+                <label className="block text-sm font-medium text-black mb-2">Other images</label>
+                <p className="text-xs text-gray-500 mb-2">Upload or paste URL for each image. Shown under the live link in the project modal.</p>
+                <div className="space-y-4">
+                  {(formData.otherImages.length ? formData.otherImages : ['']).map((url, i) => (
+                    <div key={i} className="flex gap-2 items-start">
+                      <div className="flex-1 min-w-0">
+                        <ImageUpload
+                          value={url}
+                          onChange={(newUrl) => {
+                            const next = [...formData.otherImages]
+                            if (i >= next.length) next.push(newUrl)
+                            else next[i] = newUrl
+                            setFormData({ ...formData, otherImages: next })
+                          }}
+                          folder="projects"
+                          label={i === 0 ? 'Image 1' : `Image ${i + 1}`}
+                          placeholder="Enter image URL or upload a file"
+                          inputId={`other-image-${i}`}
+                        />
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const next = formData.otherImages.filter((_, j) => j !== i)
+                          setFormData({ ...formData, otherImages: next })
+                        }}
+                        className="mt-8 px-3 py-2 border border-gray-300 hover:bg-red-50 hover:border-red-300 text-gray-600 hover:text-red-600 transition-colors"
+                        title="Remove image"
+                      >
+                        <Trash2 size={18} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setFormData({ ...formData, otherImages: [...formData.otherImages, ''] })}
+                  className="mt-2 flex items-center gap-2 px-4 py-2 border border-gray-300 hover:bg-gray-100 text-black text-sm"
+                >
+                  <Plus size={18} />
+                  Add another image
+                </button>
               </div>
 
               <div className="flex items-center gap-2">

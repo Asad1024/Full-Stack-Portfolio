@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion } from 'framer-motion'
+import { ArrowRight } from 'lucide-react'
 import ProjectModal from './ProjectModal'
 
 interface Project {
@@ -12,7 +13,7 @@ interface Project {
   githubUrl?: string
   liveUrl?: string
   imageUrl?: string
-  demoVideoUrl?: string
+  otherImages?: string[]
   role?: string
   publishedDate?: string
   mapUrl?: string
@@ -127,44 +128,16 @@ const Projects = () => {
                 className="group relative bg-white border border-gray-200 hover:border-black hover:shadow-2xl transition-all duration-500 overflow-hidden cursor-pointer rounded-2xl transform hover:-translate-y-2"
               >
 
-                {/* Project Image or Video */}
-                {(project.imageUrl || project.demoVideoUrl) && (
+                {/* Project thumbnail image */}
+                {project.imageUrl && (
                   <div className="relative w-full h-40 bg-gradient-to-br from-gray-100 to-gray-200 overflow-hidden">
-                    {project.demoVideoUrl ? (
-                      <div className="relative w-full h-full">
-                        {project.demoVideoUrl.includes('youtube.com') || project.demoVideoUrl.includes('youtu.be') ? (
-                          <iframe
-                            src={project.demoVideoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                            className="w-full h-full"
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                            allowFullScreen
-                          />
-                        ) : project.demoVideoUrl.includes('vimeo.com') ? (
-                          <iframe
-                            src={project.demoVideoUrl.replace('vimeo.com/', 'player.vimeo.com/video/')}
-                            className="w-full h-full"
-                            allow="autoplay; fullscreen; picture-in-picture"
-                            allowFullScreen
-                          />
-                        ) : (
-                          <video
-                            src={project.demoVideoUrl}
-                            className="w-full h-full object-cover"
-                            controls
-                          />
-                        )}
-                      </div>
-                    ) : project.imageUrl ? (
-                      <>
-                        <img
-                          src={project.imageUrl}
-                          alt={project.title}
-                          className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                        />
-                        {/* Gradient Overlay */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-                      </>
-                    ) : null}
+                    <img
+                      src={project.imageUrl}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
+                    />
+                    {/* Gradient Overlay */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                     
                     {/* Featured Badge */}
                     {project.featured && (
@@ -173,11 +146,12 @@ const Projects = () => {
                       </div>
                     )}
                     
-                    {/* Hover Overlay with View Details */}
-                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-500 z-10">
-                      <div className="bg-black/90 backdrop-blur-sm text-white px-6 py-3 rounded-lg font-semibold text-sm transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">
-                        View Project →
-                      </div>
+                    {/* Hover overlay: small View Project pill */}
+                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10">
+                      <span className="inline-flex items-center gap-1.5 rounded-full bg-white/95 text-black px-3 py-1.5 text-xs font-semibold shadow-lg ring-1 ring-black/10 transform translate-y-1 group-hover:translate-y-0 transition-all duration-300">
+                        View Project
+                        <ArrowRight size={12} strokeWidth={2.5} />
+                      </span>
                     </div>
                   </div>
                 )}

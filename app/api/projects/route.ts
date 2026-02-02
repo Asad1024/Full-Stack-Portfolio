@@ -23,7 +23,7 @@ export async function GET() {
       githubUrl: project.github_url || project.githubUrl,
       liveUrl: project.live_url || project.liveUrl,
       imageUrl: project.image_url || project.imageUrl,
-      demoVideoUrl: project.demo_video_url || project.demoVideoUrl,
+      otherImages: project.other_images ? (typeof project.other_images === 'string' ? (() => { try { return JSON.parse(project.other_images) } catch { return [] } })() : project.other_images) : [],
       role: project.role || '',
       publishedDate: project.published_date || project.publishedDate || '',
       mapUrl: project.map_url || project.mapUrl || '',

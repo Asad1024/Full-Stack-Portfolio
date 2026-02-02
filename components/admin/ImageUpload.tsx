@@ -10,6 +10,8 @@ interface ImageUploadProps {
   folder?: string
   label?: string
   placeholder?: string
+  /** Unique id for the file input (use when multiple ImageUpload on same page) */
+  inputId?: string
 }
 
 const ImageUpload = ({ 
@@ -17,12 +19,14 @@ const ImageUpload = ({
   onChange, 
   folder = 'images',
   label = 'Image',
-  placeholder = 'Enter image URL or upload a file'
+  placeholder = 'Enter image URL or upload a file',
+  inputId,
 }: ImageUploadProps) => {
   const [isUploading, setIsUploading] = useState(false)
   const [uploadError, setUploadError] = useState<string | null>(null)
   const [inputValue, setInputValue] = useState(value || '')
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const id = inputId ?? `file-upload-${folder}`
 
   const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -118,11 +122,11 @@ const ImageUpload = ({
             accept="image/*"
             onChange={handleFileSelect}
             className="hidden"
-            id={`file-upload-${folder}`}
+            id={id}
             disabled={isUploading}
           />
           <label
-            htmlFor={`file-upload-${folder}`}
+            htmlFor={id}
             className={`flex items-center gap-2 px-4 py-2 border border-gray-300 cursor-pointer hover:bg-gray-100 transition-colors ${
               isUploading ? 'opacity-50 cursor-not-allowed' : ''
             }`}

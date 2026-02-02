@@ -3,18 +3,19 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createSupabaseClient } from '@/lib/supabase/client'
-import { LogOut, User, Briefcase, Code, Mail, Settings, Filter, Phone, BookOpen } from 'lucide-react'
+import { LogOut, User, Briefcase, Code, Mail, Settings, Filter, Phone, BookOpen, Wrench } from 'lucide-react'
 import ProfileManager from './ProfileManager'
 import AboutManager from './AboutManager'
 import JourneyManager from './JourneyManager'
 import SkillsManager from './SkillsManager'
+import ServicesManager from './ServicesManager'
 import ProjectsManager from './ProjectsManager'
 import ContactsManager from './ContactsManager'
 import ProjectFiltersManager from './ProjectFiltersManager'
 import ContactInfoManager from './ContactInfoManager'
 import AuthDebug from './AuthDebug'
 
-type Tab = 'profile' | 'about' | 'journey' | 'skills' | 'projects' | 'project-filters' | 'contact-info' | 'contacts' | 'debug'
+type Tab = 'profile' | 'about' | 'journey' | 'skills' | 'services' | 'projects' | 'project-filters' | 'contact-info' | 'contacts' | 'debug'
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState<Tab>('profile')
@@ -31,6 +32,7 @@ const AdminDashboard = () => {
     { id: 'about' as Tab, label: 'About', icon: Settings },
     { id: 'journey' as Tab, label: 'Journey', icon: BookOpen },
     { id: 'skills' as Tab, label: 'Skills', icon: Code },
+    { id: 'services' as Tab, label: 'Services', icon: Wrench },
     { id: 'projects' as Tab, label: 'Projects', icon: Briefcase },
     { id: 'project-filters' as Tab, label: 'Project Filters', icon: Filter },
     { id: 'contact-info' as Tab, label: 'Contact Info', icon: Phone },
@@ -85,6 +87,7 @@ const AdminDashboard = () => {
             {activeTab === 'about' && <AboutManager />}
             {activeTab === 'journey' && <JourneyManager />}
             {activeTab === 'skills' && <SkillsManager />}
+            {activeTab === 'services' && <ServicesManager />}
             {activeTab === 'projects' && <ProjectsManager />}
             {activeTab === 'project-filters' && <ProjectFiltersManager />}
             {activeTab === 'contact-info' && <ContactInfoManager />}

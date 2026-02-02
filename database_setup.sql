@@ -39,6 +39,17 @@ CREATE TABLE IF NOT EXISTS skills (
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
+-- Services Table (Multiple rows - services section, admin-managed)
+CREATE TABLE IF NOT EXISTS services (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  title TEXT NOT NULL,
+  description TEXT NOT NULL,
+  icon TEXT,
+  display_order INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
 -- Projects Table (Multiple rows - your projects)
 CREATE TABLE IF NOT EXISTS projects (
   id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
@@ -48,7 +59,7 @@ CREATE TABLE IF NOT EXISTS projects (
   github_url TEXT,
   live_url TEXT,
   image_url TEXT,
-  demo_video_url TEXT,
+  other_images TEXT,
   role TEXT,
   published_date DATE,
   map_url TEXT,
@@ -75,6 +86,7 @@ CREATE TABLE IF NOT EXISTS contact_submissions (
 ALTER TABLE profile ENABLE ROW LEVEL SECURITY;
 ALTER TABLE about ENABLE ROW LEVEL SECURITY;
 ALTER TABLE skills ENABLE ROW LEVEL SECURITY;
+ALTER TABLE services ENABLE ROW LEVEL SECURITY;
 ALTER TABLE projects ENABLE ROW LEVEL SECURITY;
 ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
 
@@ -100,6 +112,10 @@ DROP POLICY IF EXISTS "Only authenticated users can insert about" ON about;
 DROP POLICY IF EXISTS "Public can read skills" ON skills;
 DROP POLICY IF EXISTS "Authenticated users can manage skills" ON skills;
 DROP POLICY IF EXISTS "Only authenticated users can manage skills" ON skills;
+
+-- Services Policies
+DROP POLICY IF EXISTS "Public can read services" ON services;
+DROP POLICY IF EXISTS "Authenticated users can manage services" ON services;
 
 -- Projects Policies
 DROP POLICY IF EXISTS "Public can read projects" ON projects;
@@ -152,6 +168,15 @@ CREATE POLICY "Public can read skills" ON skills
 
 -- Authenticated users can manage skills (admin access - all operations)
 CREATE POLICY "Authenticated users can manage skills" ON skills
+  FOR ALL USING (auth.role() = 'authenticated');
+
+-- SERVICES POLICIES
+-- Anyone can read services (public access)
+CREATE POLICY "Public can read services" ON services
+  FOR SELECT USING (true);
+
+-- Authenticated users can manage services (admin access - all operations)
+CREATE POLICY "Authenticated users can manage services" ON services
   FOR ALL USING (auth.role() = 'authenticated');
 
 -- PROJECTS POLICIES

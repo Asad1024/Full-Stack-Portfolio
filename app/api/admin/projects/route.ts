@@ -26,7 +26,7 @@ export async function GET(request: Request) {
       githubUrl: project.github_url || project.githubUrl,
       liveUrl: project.live_url || project.liveUrl,
       imageUrl: project.image_url || project.imageUrl,
-      demoVideoUrl: project.demo_video_url || project.demoVideoUrl,
+      otherImages: project.other_images ? (typeof project.other_images === 'string' ? (() => { try { return JSON.parse(project.other_images) } catch { return [] } })() : project.other_images) : [],
       role: project.role || '',
       publishedDate: project.published_date || project.publishedDate || '',
       mapUrl: project.map_url || project.mapUrl || '',
@@ -51,6 +51,7 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json()
+    const otherImages = Array.isArray(body.otherImages) ? body.otherImages : (typeof body.otherImages === 'string' ? (() => { try { return JSON.parse(body.otherImages) } catch { return [] } })() : [])
     const projectData = {
       title: body.title,
       description: body.description,
@@ -60,7 +61,7 @@ export async function POST(request: Request) {
       github_url: body.githubUrl || body.github_url,
       live_url: body.liveUrl || body.live_url,
       image_url: body.imageUrl || body.image_url,
-      demo_video_url: body.demoVideoUrl || body.demo_video_url,
+      other_images: JSON.stringify(Array.isArray(otherImages) ? otherImages : []),
       role: body.role || null,
       published_date: body.publishedDate || body.published_date || null,
       map_url: body.mapUrl || body.map_url || null,
@@ -102,6 +103,7 @@ export async function PUT(request: Request) {
     const body = await request.json()
     const { id, ...rest } = body
     
+    const otherImages = Array.isArray(rest.otherImages) ? rest.otherImages : (typeof rest.otherImages === 'string' ? (() => { try { return JSON.parse(rest.otherImages) } catch { return [] } })() : [])
     const projectData = {
       title: rest.title,
       description: rest.description,
@@ -111,7 +113,7 @@ export async function PUT(request: Request) {
       github_url: rest.githubUrl || rest.github_url,
       live_url: rest.liveUrl || rest.live_url,
       image_url: rest.imageUrl || rest.image_url,
-      demo_video_url: rest.demoVideoUrl || rest.demo_video_url,
+      other_images: JSON.stringify(Array.isArray(otherImages) ? otherImages : []),
       role: rest.role || null,
       published_date: rest.publishedDate || rest.published_date || null,
       map_url: rest.mapUrl || rest.map_url || null,

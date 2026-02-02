@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, Copy, ExternalLink, ChevronLeft, ChevronRight, Calendar, Github } from 'lucide-react'
+import { X, Copy, ExternalLink, Calendar, Github } from 'lucide-react'
 
 interface Project {
   id: string
@@ -12,7 +12,7 @@ interface Project {
   githubUrl?: string
   liveUrl?: string
   imageUrl?: string
-  demoVideoUrl?: string
+  otherImages?: string[]
   featured: boolean
   role?: string
   publishedDate?: string
@@ -26,16 +26,14 @@ interface ProjectModalProps {
 }
 
 const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const [copied, setCopied] = useState(false)
 
-  // Get all images for carousel (main image + any additional)
-  const images = project?.imageUrl ? [project.imageUrl] : []
+  const thumbnail = project?.imageUrl
+  const otherImages = Array.isArray(project?.otherImages) ? project.otherImages : []
 
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden'
-      setCurrentImageIndex(0)
     } else {
       document.body.style.overflow = 'unset'
     }
@@ -49,18 +47,6 @@ const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
       navigator.clipboard.writeText(project.liveUrl)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
-    }
-  }
-
-  const nextImage = () => {
-    if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev + 1) % images.length)
-    }
-  }
-
-  const prevImage = () => {
-    if (images.length > 0) {
-      setCurrentImageIndex((prev) => (prev - 1 + images.length) % images.length)
     }
   }
 
@@ -122,27 +108,38 @@ const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
                 </div>
               </div>
 
-              {/* Content - Two Column Layout, NO SCROLL */}
-              <div className="flex-1 overflow-hidden">
-                <div className="h-full grid grid-cols-1 lg:grid-cols-[40%_60%] gap-0">
-                  {/* Left Column - 40% - Project Description, Skills and Deliverables */}
-                  <div className="p-6 md:p-8 overflow-y-auto">
-                    <div className="h-full flex flex-col space-y-5">
-                      {/* Role */}
+              {/* Content - Two columns; left static, right (images) scrolls */}
+              <div className="flex-1 min-h-0 overflow-hidden">
+                <div className="grid grid-cols-1 lg:grid-cols-[40%_60%] grid-rows-[auto_1fr] lg:grid-rows-1 gap-0 h-full min-h-0">
+                  {/* Left Column - 40% - Static: Role, Description, Skills at bottom */}
+                  <div className="p-6 md:p-8 flex flex-col flex-shrink-0 overflow-hidden">
+                    <div className="flex flex-col flex-1 min-h-0">
+                      {/* Role - static */}
                       <div>
                         <p className="text-sm text-gray-600 mb-1">
                           My role. <span className="text-base font-medium text-black">{project.role || 'Full-Stack Developer'}</span>
                         </p>
                       </div>
 
-                      {/* Project Description */}
-                      <div className="flex-1 min-h-0" style={{ marginTop: '4rem' }}>
+                      {/* Project Description - static */}
+                      <div style={{ marginTop: '4rem' }}>
                         <h3 className="text-lg font-normal text-gray-600 mb-2">Project description.</h3>
                         <p className="text-gray-700 leading-relaxed text-sm">{project.description}</p>
                       </div>
 
-                      {/* Skills and Deliverables */}
-                      <div>
+                      {/* Spacer - pushes skills to bottom */}
+                      <div className="flex-1 min-h-4" />
+
+                      {/* Published Date */}
+                      {project.publishedDate && (
+                        <div className="flex items-center gap-2 text-sm text-gray-600 mb-5">
+                          <Calendar size={14} />
+                          <span>Published on {new Date(project.publishedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
+                        </div>
+                      )}
+
+                      {/* Skills and Deliverables - at bottom */}
+                      <div className="mt-auto">
                         <h3 className="text-lg font-normal text-gray-600 mb-2">Skills and deliverables</h3>
                         <div className="flex flex-wrap gap-2">
                           {project.technologies.map((tech) => (
@@ -155,114 +152,26 @@ const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
                           ))}
                         </div>
                       </div>
-
-                      {/* Published Date */}
-                      {project.publishedDate && (
-                        <div className="flex items-center gap-2 text-sm text-gray-600">
-                          <Calendar size={14} />
-                          <span>Published on {new Date(project.publishedDate).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}</span>
-                        </div>
-                      )}
                     </div>
                   </div>
 
-                  {/* Right Column - 60% - Image and Link */}
-                  <div className="p-6 md:p-8 overflow-y-auto">
-                    <div className="h-full flex flex-col space-y-4">
-                      {/* Image Carousel */}
-                      {images.length > 0 && (
-                        <div className="relative group">
-                          <div className="relative w-full h-56 md:h-72 lg:h-80 bg-gray-200 overflow-hidden rounded-md">
-                            <img
-                              src={images[currentImageIndex]}
-                              alt={project.title}
-                              className="w-full h-full object-cover"
-                            />
-                            {images.length > 1 && (
-                              <>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    prevImage()
-                                  }}
-                                  className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black bg-opacity-50 hover:bg-opacity-70 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 rounded-full"
-                                >
-                                  <ChevronLeft size={20} />
-                                </button>
-                                <button
-                                  onClick={(e) => {
-                                    e.stopPropagation()
-                                    nextImage()
-                                  }}
-                                  className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 bg-black bg-opacity-50 hover:bg-opacity-70 text-white flex items-center justify-center transition-all opacity-0 group-hover:opacity-100 rounded-full"
-                                >
-                                  <ChevronRight size={20} />
-                                </button>
-                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-                                  {images.map((_, index) => (
-                                    <button
-                                      key={index}
-                                      onClick={(e) => {
-                                        e.stopPropagation()
-                                        setCurrentImageIndex(index)
-                                      }}
-                                      className={`w-2 h-2 rounded-full transition-all ${
-                                        index === currentImageIndex ? 'bg-white' : 'bg-white bg-opacity-50'
-                                      }`}
-                                    />
-                                  ))}
-                                </div>
-                              </>
-                            )}
-                          </div>
+                  {/* Right Column - 60% - Images section scrolls */}
+                  <div className="p-6 md:p-8 overflow-y-auto overflow-x-hidden min-h-0">
+                    <div className="flex flex-col space-y-4">
+                      {/* 1. Thumbnail image at top */}
+                      {thumbnail && (
+                        <div className="w-full rounded-md overflow-hidden border border-gray-200 bg-gray-100">
+                          <img
+                            src={thumbnail}
+                            alt={project.title}
+                            className="w-full h-56 md:h-72 lg:h-80 object-cover"
+                          />
                         </div>
                       )}
 
-                      {/* Demo Video */}
-                      {project.demoVideoUrl && !project.imageUrl && (
-                        <div className="relative w-full h-56 md:h-64 bg-gray-200 rounded-md overflow-hidden">
-                          {project.demoVideoUrl.includes('youtube.com') || project.demoVideoUrl.includes('youtu.be') ? (
-                            <iframe
-                              src={project.demoVideoUrl.replace('watch?v=', 'embed/').replace('youtu.be/', 'youtube.com/embed/')}
-                              className="w-full h-full"
-                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                              allowFullScreen
-                            />
-                          ) : project.demoVideoUrl.includes('vimeo.com') ? (
-                            <iframe
-                              src={project.demoVideoUrl.replace('vimeo.com/', 'player.vimeo.com/video/')}
-                              className="w-full h-full"
-                              allow="autoplay; fullscreen; picture-in-picture"
-                              allowFullScreen
-                            />
-                          ) : (
-                            <video
-                              src={project.demoVideoUrl}
-                              className="w-full h-full object-cover"
-                              controls
-                            />
-                          )}
-                        </div>
-                      )}
-
-                      {/* Map */}
-                      {project.mapUrl && (
-                        <div className="border border-gray-300 rounded-md overflow-hidden">
-                          <div className="h-40 md:h-44 bg-gray-100 relative">
-                            <iframe
-                              src={project.mapUrl}
-                              className="w-full h-full border-0"
-                              allowFullScreen
-                              loading="lazy"
-                              referrerPolicy="no-referrer-when-downgrade"
-                            />
-                          </div>
-                        </div>
-                      )}
-
-                      {/* Live Project Link */}
+                      {/* 2. Link box */}
                       {project.liveUrl && (
-                        <div className="bg-gray-50 border border-gray-300 p-7 mt-auto rounded-md relative">
+                        <div className="bg-gray-50 border border-gray-300 p-7 rounded-md relative">
                           <a
                             href={project.liveUrl}
                             target="_blank"
@@ -284,6 +193,42 @@ const ProjectModal = ({ project, isOpen, onClose }: ProjectModalProps) => {
                               {project.liveUrl.replace(/^https?:\/\//, '').replace(/\/$/, '')}
                             </p>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Map */}
+                      {project.mapUrl && (
+                        <div className="border border-gray-300 rounded-md overflow-hidden">
+                          <div className="h-40 md:h-44 bg-gray-100 relative">
+                            <iframe
+                              src={project.mapUrl}
+                              className="w-full h-full border-0"
+                              allowFullScreen
+                              loading="lazy"
+                              referrerPolicy="no-referrer-when-downgrade"
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* 3. Other images: below link box, same size as thumbnail; scroll in whole modal to see them */}
+                      {otherImages.length > 0 && (
+                        <div className="space-y-4">
+                          {otherImages.map((url, i) => (
+                            <a
+                              key={i}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="w-full rounded-md overflow-hidden border border-gray-200 bg-gray-100 hover:border-black transition-colors focus:outline-none focus:ring-2 focus:ring-black focus:ring-offset-1 block"
+                            >
+                              <img
+                                src={url}
+                                alt=""
+                                className="w-full h-56 md:h-72 lg:h-80 object-cover"
+                              />
+                            </a>
+                          ))}
                         </div>
                       )}
                     </div>
