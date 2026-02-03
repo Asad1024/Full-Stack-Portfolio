@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { Plus, Trash2, Edit2, X } from 'lucide-react'
+import { Plus, Trash2, Edit2, X, ArrowUp, ArrowDown } from 'lucide-react'
 import { authFetch } from '@/lib/api-helpers'
 import ImageUpload from './ImageUpload'
 
@@ -10,6 +10,8 @@ interface Project {
   title: string
   description: string
   technologies: string[]
+  category?: string
+  display_order?: number
   githubUrl?: string
   liveUrl?: string
   imageUrl?: string
@@ -18,8 +20,15 @@ interface Project {
   featured: boolean
 }
 
+interface ProjectCategory {
+  id: string
+  name: string
+  display_order: number
+}
+
 const ProjectsManager = () => {
   const [projects, setProjects] = useState<Project[]>([])
+  const [categories, setCategories] = useState<ProjectCategory[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingProject, setEditingProject] = useState<Project | null>(null)
@@ -27,6 +36,8 @@ const ProjectsManager = () => {
     title: '',
     description: '',
     technologies: '',
+    category: 'Original',
+    displayOrder: 0,
     githubUrl: '',
     liveUrl: '',
     imageUrl: '',
@@ -37,7 +48,20 @@ const ProjectsManager = () => {
 
   useEffect(() => {
     fetchProjects()
+    fetchCategories()
   }, [])
+
+  const fetchCategories = async () => {
+    try {
+      const res = await authFetch('/api/admin/project-categories')
+      if (res.ok) {
+        const data = await res.json()
+        setCategories(data || [])
+      }
+    } catch (e) {
+      console.error('Error fetching categories:', e)
+    }
+  }
 
   const fetchProjects = async () => {
     try {
@@ -50,6 +74,8 @@ const ProjectsManager = () => {
             technologies: Array.isArray(p.technologies) 
               ? p.technologies 
               : p.technologies ? JSON.parse(p.technologies) : [],
+            category: p.category || 'Original',
+            display_order: p.display_order ?? 0,
             githubUrl: p.github_url || p.githubUrl,
             liveUrl: p.live_url || p.liveUrl,
             imageUrl: p.image_url || p.imageUrl,
@@ -84,6 +110,7 @@ const ProjectsManager = () => {
         ...formData,
         technologies,
         otherImages,
+        displayOrder: formData.displayOrder,
       }
 
       const url = '/api/admin/projects'
@@ -105,6 +132,8 @@ const ProjectsManager = () => {
           title: '',
           description: '',
           technologies: '',
+          category: 'Original',
+          displayOrder: 0,
           githubUrl: '',
           liveUrl: '',
           imageUrl: '',
@@ -145,6 +174,8 @@ const ProjectsManager = () => {
       title: project.title,
       description: project.description,
       technologies: project.technologies.join(', '),
+      category: project.category || 'Original',
+      displayOrder: project.display_order ?? 0,
       githubUrl: project.githubUrl || '',
       liveUrl: project.liveUrl || '',
       imageUrl: project.imageUrl || '',
@@ -155,71 +186,142 @@ const ProjectsManager = () => {
     setIsModalOpen(true)
   }
 
+  const handleMove = async (project: Project, direction: 'up' | 'down') => {
+    const sorted = [...projects].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+    const idx = sorted.findIndex((p) => p.id === project.id)
+    if (idx === -1) return
+    const targetIdx = direction === 'up' ? idx - 1 : idx + 1
+    if (targetIdx < 0 || targetIdx >= sorted.length) return
+    const target = sorted[targetIdx]
+    try {
+      const response = await authFetch('/api/admin/projects', {
+        method: 'PATCH',
+        body: JSON.stringify({
+          updates: [
+            { id: project.id, displayOrder: target.display_order ?? 0 },
+            { id: target.id, displayOrder: project.display_order ?? 0 },
+          ],
+        }),
+      })
+      if (response.ok) fetchProjects()
+    } catch (e) {
+      console.error('Error reordering:', e)
+    }
+  }
+
+  const sortedProjects = [...projects].sort((a, b) => (a.display_order ?? 0) - (b.display_order ?? 0))
+
   if (isLoading) {
     return <div className="text-black">Loading...</div>
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-3xl font-bold text-black">Projects Management</h2>
+    <div className="w-full max-w-6xl">
+      <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 md:mb-8">
+        <div>
+          <h2 className="text-2xl md:text-3xl font-bold text-black">Projects</h2>
+          <p className="text-gray-600 mt-1 text-sm md:text-base">Manage projects shown on the Projects page</p>
+        </div>
         <button
+          type="button"
           onClick={() => {
             setEditingProject(null)
-        setFormData({
-          title: '',
-          description: '',
-          technologies: '',
-          githubUrl: '',
-          liveUrl: '',
-          imageUrl: '',
-          otherImages: [],
-          role: '',
-          featured: false,
-        })
+            const maxOrder = Math.max(...projects.map((p) => p.display_order ?? 0), -1)
+            setFormData({
+              title: '',
+              description: '',
+              technologies: '',
+              category: 'Original',
+              displayOrder: maxOrder + 1,
+              githubUrl: '',
+              liveUrl: '',
+              imageUrl: '',
+              otherImages: [],
+              role: '',
+              featured: false,
+            })
             setIsModalOpen(true)
           }}
-          className="flex items-center gap-2 bg-black text-white px-4 py-2 hover:bg-gray-800 transition-colors"
+          className="flex items-center justify-center gap-2 bg-black text-white px-4 py-3 rounded-xl hover:bg-gray-800 transition-colors w-full sm:w-auto shrink-0"
         >
           <Plus size={18} />
           Add Project
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {projects.map((project) => (
-          <div key={project.id} className="border border-gray-200 p-6">
-            <div className="flex justify-between items-start mb-4">
-              <h3 className="text-xl font-bold text-black">{project.title}</h3>
-              <div className="flex gap-2">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
+        {sortedProjects.map((project, index) => (
+          <div
+            key={project.id}
+            className="rounded-2xl border border-gray-200 bg-white shadow-sm hover:shadow-md hover:border-gray-300 transition-all flex flex-col overflow-hidden"
+          >
+            <div className="p-4 md:p-5 pb-2 flex items-start justify-between gap-3">
+              <h3 className="font-semibold text-black text-base md:text-lg truncate flex-1 min-w-0 pt-0.5">
+                {project.title}
+              </h3>
+              <div className="flex items-center gap-1 shrink-0">
                 <button
+                  type="button"
                   onClick={() => handleEdit(project)}
-                  className="text-black hover:text-gray-600"
+                  className="p-2 rounded-lg text-gray-500 hover:text-black hover:bg-gray-100 transition-colors"
+                  title="Edit"
                 >
                   <Edit2 size={18} />
                 </button>
                 <button
+                  type="button"
                   onClick={() => handleDelete(project.id)}
-                  className="text-red-600 hover:text-red-800"
+                  className="p-2 rounded-lg text-gray-500 hover:text-red-600 hover:bg-red-50 transition-colors"
+                  title="Delete"
                 >
                   <Trash2 size={18} />
                 </button>
               </div>
             </div>
-            <p className="text-gray-600 mb-4">{project.description}</p>
-            <div className="flex flex-wrap gap-2 mb-4">
-              {project.technologies.map((tech) => (
-                <span key={tech} className="px-2 py-1 bg-gray-100 text-black text-xs">
-                  {tech}
-                </span>
-              ))}
+            <div className="px-4 md:px-5 py-2 flex-1 min-h-0">
+              <p className="text-sm text-gray-500 line-clamp-3">{project.description}</p>
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {project.category && (
+                  <span className="px-2 py-0.5 bg-zinc-100 text-zinc-600 text-xs rounded">{project.category}</span>
+                )}
+                {project.featured && (
+                  <span className="px-2 py-0.5 bg-black text-white text-xs rounded">Featured</span>
+                )}
+              </div>
             </div>
-            {project.featured && (
-              <span className="inline-block px-2 py-1 bg-black text-white text-xs">Featured</span>
-            )}
+            <div className="px-4 md:px-5 py-3 border-t border-gray-100 flex items-center justify-between gap-2">
+              <span className="text-xs text-gray-400">Order: {project.display_order ?? 0}</span>
+              <div className="flex items-center gap-0.5">
+                <button
+                  type="button"
+                  onClick={() => handleMove(project, 'up')}
+                  disabled={index === 0}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 disabled:opacity-30 disabled:pointer-events-none"
+                  title="Move up"
+                >
+                  <ArrowUp size={16} />
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleMove(project, 'down')}
+                  disabled={index === sortedProjects.length - 1}
+                  className="p-1.5 rounded-lg text-gray-400 hover:text-black hover:bg-gray-100 disabled:opacity-30 disabled:pointer-events-none"
+                  title="Move down"
+                >
+                  <ArrowDown size={16} />
+                </button>
+              </div>
+            </div>
           </div>
         ))}
       </div>
+
+      {sortedProjects.length === 0 && (
+        <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50/50 py-12 px-6 text-center">
+          <p className="text-gray-500">No projects yet.</p>
+          <p className="text-gray-400 text-sm mt-1">Click &quot;Add Project&quot; to get started.</p>
+        </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -257,6 +359,24 @@ const ProjectsManager = () => {
                   rows={5}
                   required
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">Category</label>
+                <select
+                  value={formData.category}
+                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none bg-white text-black"
+                >
+                  {categories.length > 0 ? (
+                    categories.map((c) => (
+                      <option key={c.id} value={c.name}>{c.name}</option>
+                    ))
+                  ) : (
+                    <option value="Original">Original</option>
+                  )}
+                </select>
+                <p className="text-xs text-gray-500 mt-1">Manage categories in Project Categories.</p>
               </div>
 
               <div>
@@ -355,6 +475,18 @@ const ProjectsManager = () => {
                   <Plus size={18} />
                   Add another image
                 </button>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-black mb-2">Display order</label>
+                <input
+                  type="number"
+                  value={formData.displayOrder}
+                  onChange={(e) => setFormData({ ...formData, displayOrder: parseInt(e.target.value) || 0 })}
+                  className="w-full px-4 py-2 border border-gray-300 focus:border-black focus:outline-none bg-white text-black"
+                  min={0}
+                />
+                <p className="text-xs text-gray-500 mt-1">Lower numbers appear first. Use arrows on cards to reorder.</p>
               </div>
 
               <div className="flex items-center gap-2">

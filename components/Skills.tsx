@@ -157,9 +157,9 @@ const Skills = () => {
                     <button
                       type="button"
                       onClick={() => handleCategoryClick(category)}
-                      className={`w-full h-full min-h-[160px] p-4 rounded-lg border-2 transition-all duration-300 flex flex-col items-center justify-between gap-2 hover:shadow-lg bg-white dark:bg-zinc-900 ${
+                      className={`w-full h-full min-h-[160px] p-4 rounded-xl border transition-all duration-300 flex flex-col items-center justify-between gap-2 hover:shadow-lg bg-white dark:bg-zinc-900 ${
                         isSelected 
-                          ? 'border-black dark:border-white shadow-lg' 
+                          ? 'border-gray-400 dark:border-zinc-400 shadow-md ring-1 ring-gray-200 dark:ring-zinc-600' 
                           : 'border-gray-200 dark:border-zinc-600 hover:border-gray-300 dark:hover:border-zinc-500'
                       }`}
                     >
@@ -191,8 +191,8 @@ const Skills = () => {
                 transition={{ duration: 0.3 }}
                 className="max-w-6xl mx-auto"
               >
-                <div className="bg-gray-50 border-2 border-black rounded-lg p-6 md:p-8">
-                  <h3 className="text-2xl font-bold text-black mb-6">
+                <div className="bg-gray-50 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-600 rounded-xl p-6 md:p-8 shadow-sm">
+                  <h3 className="text-2xl font-bold text-black dark:text-white mb-6">
                     {selectedCategory}
                   </h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -202,7 +202,7 @@ const Skills = () => {
                         initial={{ opacity: 0, scale: 0.9 }}
                         animate={{ opacity: 1, scale: 1 }}
                         transition={{ duration: 0.3, delay: skillIndex * 0.05 }}
-                        className="flex flex-col items-center justify-center p-4 bg-white border border-gray-200 rounded-md hover:border-black hover:shadow-md transition-all duration-300"
+                        className="flex flex-col items-center justify-center p-4 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-600 rounded-lg hover:border-gray-400 hover:shadow-md transition-all duration-300"
                       >
                         {skill.imageUrl ? (
                           <div className="w-12 h-12 rounded-md bg-white flex items-center justify-center p-2 mb-3">
@@ -219,7 +219,7 @@ const Skills = () => {
                             </span>
                           </div>
                         )}
-                        <span className="text-sm font-semibold text-black text-center">
+                        <span className="text-sm font-semibold text-black dark:text-white text-center">
                           {skill.name}
                         </span>
                       </motion.div>

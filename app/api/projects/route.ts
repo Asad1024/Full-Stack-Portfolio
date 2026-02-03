@@ -1,14 +1,17 @@
 import { NextResponse } from 'next/server'
 import { createSupabaseServerClient } from '@/lib/supabase/server'
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
     const supabase = createSupabaseServerClient()
-    
-    const { data, error } = await supabase
-      .from('projects')
-      .select('*')
-      .order('created_at', { ascending: false })
+    const { searchParams } = new URL(request.url)
+    const featuredOnly = searchParams.get('featured') === 'true'
+
+    let query = supabase.from('projects').select('*').order('display_order', { ascending: true }).order('created_at', { ascending: false })
+    if (featuredOnly) {
+      query = query.eq('featured', true)
+    }
+    const { data, error } = await query
 
     if (error) {
       throw error
@@ -20,6 +23,7 @@ export async function GET() {
       technologies: Array.isArray(project.technologies) 
         ? project.technologies 
         : project.technologies ? JSON.parse(project.technologies) : [],
+      category: project.category || 'Original',
       githubUrl: project.github_url || project.githubUrl,
       liveUrl: project.live_url || project.liveUrl,
       imageUrl: project.image_url || project.imageUrl,

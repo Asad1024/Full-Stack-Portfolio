@@ -12,6 +12,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase
       .from('projects')
       .select('*')
+      .order('display_order', { ascending: true })
       .order('created_at', { ascending: false })
 
     if (error) {
@@ -58,6 +59,8 @@ export async function POST(request: Request) {
       technologies: Array.isArray(body.technologies) 
         ? JSON.stringify(body.technologies) 
         : body.technologies,
+      category: body.category || 'Original',
+      display_order: body.displayOrder ?? body.display_order ?? 0,
       github_url: body.githubUrl || body.github_url,
       live_url: body.liveUrl || body.live_url,
       image_url: body.imageUrl || body.image_url,
@@ -110,6 +113,8 @@ export async function PUT(request: Request) {
       technologies: Array.isArray(rest.technologies) 
         ? JSON.stringify(rest.technologies) 
         : rest.technologies,
+      category: rest.category || 'Original',
+      display_order: rest.displayOrder ?? rest.display_order ?? 0,
       github_url: rest.githubUrl || rest.github_url,
       live_url: rest.liveUrl || rest.live_url,
       image_url: rest.imageUrl || rest.image_url,
@@ -173,6 +178,44 @@ export async function DELETE(request: Request) {
     console.error('Error deleting project:', error)
     return NextResponse.json(
       { error: 'Failed to delete project' },
+      { status: 500 }
+    )
+  }
+}
+
+export async function PATCH(request: Request) {
+  try {
+    const { user, supabase, error: authError } = await checkApiAuth(request)
+
+    if (authError || !user) {
+      return unauthorizedResponse(authError)
+    }
+
+    const body = await request.json()
+    const { updates } = body
+
+    if (!Array.isArray(updates)) {
+      return NextResponse.json(
+        { error: 'Updates must be an array' },
+        { status: 400 }
+      )
+    }
+
+    const updatePromises = updates.map((update: { id: string; displayOrder?: number }) => {
+      const updateData: { display_order?: number } = {}
+      if (update.displayOrder !== undefined) {
+        updateData.display_order = update.displayOrder
+      }
+      return supabase.from('projects').update(updateData).eq('id', update.id)
+    })
+
+    await Promise.all(updatePromises)
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error updating project orders:', error)
+    return NextResponse.json(
+      { error: 'Failed to update project orders' },
       { status: 500 }
     )
   }
